@@ -24,7 +24,7 @@ def apply_filter():
         filtered_image.save(output, format='JPEG')
         output.seek(0)
 
-        return send_file(output, mimetype='image/jpeg', as_attachment=False
+        return send_file(output, mimetype='image/jpeg', as_attachment=False)
                          
     except Exception as e:
         return jsonify(error=str(e)), 500
