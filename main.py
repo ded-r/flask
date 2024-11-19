@@ -8,7 +8,7 @@ CORS(app)
 
 @app.route('/')
 def index():
-    return jsonify({"Welcome to Flask image filtering app 🚅"})
+    return jsonify(message="Welcome to Flask image filtering app 🚅")
 
 @app.route('/apply-filter', methods=['POST'])
 def apply_filter():
