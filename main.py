@@ -26,7 +26,7 @@ def apply_filter():
 
         return send_file(output, mimetype='image/jpeg', as_attachment=False
                          
-      except Exception as e:
+    except Exception as e:
         return jsonify(error=str(e)), 500
           
 if __name__ == "__main__":
