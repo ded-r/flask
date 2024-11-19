@@ -4,13 +4,13 @@ from PIL import Image, ImageFilter
 import io
 
 app = Flask(__name__)
-CORS(app)  # Enables CORS for cross-origin requests
+CORS(app)  
 
 @app.route('/')
 def index():
     return jsonify({"Welcome to Flask image filtering app 🚅"})
 
-@app.route('/apply-filter/', methods=['POST'])
+@app.route('/apply-filter', methods=['POST'])
 def apply_filter():
     if 'image' not in request.files:
         return {"error": "No image uploaded"}, 400
