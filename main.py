@@ -1,12 +1,20 @@
-from flask import Flask, request, jsonify, send_file
-from PIL import Image, ImageFilter
+from flask import Flask, request, jsonify
 import base64
-import io
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
+from io import BytesIO
+from PIL import Image, ImageFilter
 
 app = Flask(__name__)
+
+# Allowed image formats
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def encode_image_to_base64(image: Image) -> str:
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")  
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 @app.route('/apply-filters', methods=['POST'])
 def apply_filters():
@@ -15,12 +23,15 @@ def apply_filters():
             return jsonify({"error": "No image file provided"}), 400
         
         image_file = request.files['image']
-        
+
+        if not allowed_file(image_file.filename):
+            return jsonify({"error": "Invalid file type. Only PNG and JPEG are allowed."}), 400
+
         image = Image.open(image_file)
-        
+
         if image.mode == 'RGBA':
             image = image.convert('RGB')
-            
+
         filters = {
             "blur": image.filter(ImageFilter.BLUR),
             "sharpen": image.filter(ImageFilter.SHARPEN),
@@ -29,20 +40,15 @@ def apply_filters():
             "grayscale": image.convert("L")  # Convert to grayscale
         }
 
-        image_urls = []
+        image_base64 = {}
         for filter_name, filtered_image in filters.items():
-            output = io.BytesIO()
-            filtered_image.save(output, format='JPEG')
-            output.seek(0)
-            
-            img_url = f"data:image/jpeg;base64,{base64.b64encode(output.getvalue()).decode()}"
-            image_urls.append({filter_name: img_url})
-        
-        return jsonify({"images": image_urls})
-    
+            # Convert the filtered image to base64
+            image_base64[filter_name] = encode_image_to_base64(filtered_image)
+
+        return jsonify({"images": image_base64})
+
     except Exception as e:
-        app.logger.error(f"Error processing image: {str(e)}")  # Log the error
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
