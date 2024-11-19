@@ -37,7 +37,8 @@ def apply_filters():
             "sharpen": image.filter(ImageFilter.SHARPEN),
             "contour": image.filter(ImageFilter.CONTOUR),
             "edge_enhance": image.filter(ImageFilter.EDGE_ENHANCE),
-            "grayscale": image.convert("L")  # Convert to grayscale
+            "emboss": image.filter(ImageFilter.EMBOSS),
+            "detail": image.filter(ImageFilter.DETAIL)
         }
 
         image_base64 = {}
