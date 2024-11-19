@@ -21,6 +21,8 @@ def apply_filter():
     output = io.BytesIO()
     filtered_image.save(output, format='JPEG')
     output.seek(0)
+
+    return send_file(output, mimetype='image/jpeg', as_attachment=False)
     
     # Send the processed image back as a response
     return jsonify({"message": "Filter applied successfully!"})
