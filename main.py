@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_file
 from PIL import Image, ImageFilter
+import base64
 import io
 import logging
 
