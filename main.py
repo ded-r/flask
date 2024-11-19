@@ -3,13 +3,12 @@ from PIL import Image, ImageFilter
 import io
 import logging
 
-# Enable Flask logging
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
-@app.route('/apply-filter', methods=['POST'])
-def apply_filter():
+@app.route('/apply-filters', methods=['POST'])
+def apply_filters():
     try:
         if 'image' not in request.files:
             return jsonify({"error": "No image file provided"}), 400
@@ -20,14 +19,25 @@ def apply_filter():
         
         if image.mode == 'RGBA':
             image = image.convert('RGB')
+            
+        filters = {
+            "blur": image.filter(ImageFilter.BLUR),
+            "sharpen": image.filter(ImageFilter.SHARPEN),
+            "contour": image.filter(ImageFilter.CONTOUR),
+            "edge_enhance": image.filter(ImageFilter.EDGE_ENHANCE),
+            "grayscale": image.convert("L")  # Convert to grayscale
+        }
+
+        image_urls = []
+        for filter_name, filtered_image in filters.items():
+            output = io.BytesIO()
+            filtered_image.save(output, format='JPEG')
+            output.seek(0)
+            
+            img_url = f"data:image/jpeg;base64,{base64.b64encode(output.getvalue()).decode()}"
+            image_urls.append({filter_name: img_url})
         
-        filtered_image = image.filter(ImageFilter.BLUR)
-        
-        output = io.BytesIO()
-        filtered_image.save(output, format='JPEG')
-        output.seek(0)
-        
-        return send_file(output, mimetype='image/jpeg', as_attachment=False)
+        return jsonify({"images": image_urls})
     
     except Exception as e:
         app.logger.error(f"Error processing image: {str(e)}")  # Log the error
