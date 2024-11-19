@@ -4,7 +4,7 @@ from PIL import Image, ImageFilter
 import io
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for communication with React frontend
+CORS(app, origins=["http://localhost:5173"])
 
 @app.route('/apply-filter', methods=['POST'])
 def apply_filter():
