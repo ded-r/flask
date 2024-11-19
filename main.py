@@ -1,31 +1,25 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from PIL import Image, ImageFilter
 import io
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(app)  # Enables CORS for cross-origin requests
 
 @app.route('/apply-filter', methods=['POST'])
 def apply_filter():
     if 'image' not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
-    
+        return {"error": "No image uploaded"}, 400
+
     image_file = request.files['image']
     image = Image.open(image_file)
-    
-    # Apply a sample filter (e.g., BLUR)
     filtered_image = image.filter(ImageFilter.BLUR)
-    
-    # Save the filtered image to a BytesIO object
+
     output = io.BytesIO()
     filtered_image.save(output, format='JPEG')
     output.seek(0)
 
     return send_file(output, mimetype='image/jpeg', as_attachment=False)
-    
-    # Send the processed image back as a response
-    return jsonify({"message": "Filter applied successfully!"})
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
