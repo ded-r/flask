@@ -6,6 +6,10 @@ import io
 app = Flask(__name__)
 CORS(app)  # Enables CORS for cross-origin requests
 
+@app.route('/')
+def index():
+    return jsonify({"Welcome to Flask image filtering app 🚅"})
+
 @app.route('/apply-filter/', methods=['POST'])
 def apply_filter():
     if 'image' not in request.files:
