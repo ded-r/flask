@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import base64
 from io import BytesIO
 from PIL import Image, ImageFilter
 
 app = Flask(__name__)
+CORS(app, origins=["https://image-filter-inf440.netlify.app"])
 
-# Allowed image formats
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 def allowed_file(filename):
